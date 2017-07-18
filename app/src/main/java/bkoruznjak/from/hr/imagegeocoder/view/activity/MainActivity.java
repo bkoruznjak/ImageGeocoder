@@ -9,8 +9,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import bkoruznjak.from.hr.imagegeocoder.R;
 import bkoruznjak.from.hr.imagegeocoder.databinding.ActivityMainBinding;
+import bkoruznjak.from.hr.imagegeocoder.library.ImageMetaReader;
 import bkoruznjak.from.hr.imagegeocoder.library.ImageScanner;
 import bkoruznjak.from.hr.imagegeocoder.util.PermissionHelper;
 
@@ -18,13 +22,16 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
 
     private ActivityMainBinding mainBinding;
     private ImageScanner mImageScanner;
+    private ArrayList<File> mFileList;
+    private ImageMetaReader mImageMetaReader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
+        mFileList = new ArrayList<>();
         mImageScanner = new ImageScanner();
+        mImageMetaReader = new ImageMetaReader();
         mainBinding.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,5 +76,10 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
     @Override
     public void onMediaFound(String data) {
         Log.d("žžž", "photo found:" + data);
+        File imgFile = new File(data);
+        Log.d("žžž", "created new file:" + imgFile.isFile());
+        mFileList.add(imgFile);
+
+        mImageMetaReader.reatMetadataLoc(data);
     }
 }
