@@ -40,7 +40,7 @@ public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
         List<Address> addresses = null;
 
         try {
-            addresses = geocoder.getFromLocation(params[0], params[1], 1);
+            addresses = geocoder.getFromLocation(params[0], params[1], 10);
             latitude = params[0];
             longitude = params[1];
         } catch (IOException ioException) {
@@ -54,7 +54,7 @@ public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
         }
 
         if (addresses != null && addresses.size() > 0)
-            return addresses.get(0);
+            return addresses.get(1);
 
         return null;
     }
@@ -63,9 +63,12 @@ public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
         ((MainActivity) mActivity).manageProgressBar(false);
         if (address != null) {
             String addressName = "";
-            for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-                addressName += " --- " + address.getAddressLine(i);
+            if (address.getSubLocality() != null && address.getAdminArea() != null) {
+                addressName = address.getSubLocality().concat(", ").concat(address.getAdminArea());
+            } else {
+                addressName = address.getFeatureName().concat(", ").concat(address.getCountryName());
             }
+
             ((MainActivity) mActivity).addImageMarker(latitude, longitude, addressName);
             Toast.makeText(mActivity, addressName, Toast.LENGTH_SHORT).show();
         } else {
