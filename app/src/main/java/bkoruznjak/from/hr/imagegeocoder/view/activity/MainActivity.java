@@ -1,6 +1,5 @@
 package bkoruznjak.from.hr.imagegeocoder.view.activity;
 
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -18,6 +17,7 @@ import java.util.List;
 
 import bkoruznjak.from.hr.imagegeocoder.R;
 import bkoruznjak.from.hr.imagegeocoder.databinding.ActivityMainBinding;
+import bkoruznjak.from.hr.imagegeocoder.geocode.GeocodeAsyncTask;
 import bkoruznjak.from.hr.imagegeocoder.library.ImageMetaReader;
 import bkoruznjak.from.hr.imagegeocoder.library.ImageScanner;
 import bkoruznjak.from.hr.imagegeocoder.util.PermissionHelper;
@@ -31,8 +31,6 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
     private RecyclerView.LayoutManager mLayoutManager;
     private List<File> mFileList;
     private ImageMetaReader mImageMetaReader;
-    private Float[] mLocData = new Float[2];
-    private final Activity INSTANCE = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         if (PermissionHelper.hasReadStorageRights(getBaseContext())) {
             startImageScanner();
         } else {
-            PermissionHelper.requestReadStorage(INSTANCE);
+            PermissionHelper.requestReadStorage(this);
         }
     }
 
@@ -93,9 +91,6 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         File imgFile = new File(data);
         mFileList.add(imgFile);
         mImageAdapter.notifyDataSetChanged();
-//        mLocData = mImageMetaReader.readMetadataLoc(data);
-//        Log.d("žžž", "hvatam metadata za lat:" + mLocData[0] + ", long:" + mLocData[1]);
-//        new GeocodeAsyncTask(INSTANCE).execute(mLocData[0], mLocData[1]);
     }
 
     public void manageProgressBar(boolean show) {
@@ -104,5 +99,16 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         } else {
             mainBinding.progressBar.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public void checkForLocation(int imageIndex) {
+        Float[] locationDataArray = mImageMetaReader.readMetadataLoc(mFileList.get(imageIndex).getPath());
+        if (locationDataArray[0] != 0 && locationDataArray[1] != 0) {
+            new GeocodeAsyncTask(this).execute(locationDataArray[0], locationDataArray[1]);
+        } else {
+            Toast.makeText(this, "Image does not have coordinates", Toast.LENGTH_SHORT);
+        }
+
+
     }
 }

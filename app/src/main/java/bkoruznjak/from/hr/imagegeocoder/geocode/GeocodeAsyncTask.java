@@ -10,6 +10,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
@@ -61,9 +62,7 @@ public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
             for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
                 addressName += " --- " + address.getAddressLine(i);
             }
-            Log.d("žžž", "Latitude: " + address.getLatitude() + "\n" +
-                    "Longitude: " + address.getLongitude() + "\n" +
-                    "Address: " + addressName);
+            Toast.makeText(mActivity, addressName, Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.List;
 
 import bkoruznjak.from.hr.imagegeocoder.R;
+import bkoruznjak.from.hr.imagegeocoder.view.activity.MainActivity;
 
 /**
  * Created by bkoruznjak on 18/07/2017.
@@ -43,6 +44,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
                 .load(mImageFileList.get(position))
                 .resize(600,800)
                 .into(holder.imageView);
+        holder.index = position;
     }
 
     @Override
@@ -53,6 +55,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         protected ImageView imageView;
+        protected int index;
 
         public ViewHolder(View view) {
             super(view);
@@ -63,6 +66,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
         @Override
         public void onClick(View v) {
             v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            ((MainActivity)mContext).checkForLocation(index);
         }
     }
 }
