@@ -6,25 +6,30 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import bkoruznjak.from.hr.imagegeocoder.R;
 import bkoruznjak.from.hr.imagegeocoder.databinding.ActivityMainBinding;
-import bkoruznjak.from.hr.imagegeocoder.geocode.GeocodeAsyncTask;
 import bkoruznjak.from.hr.imagegeocoder.library.ImageMetaReader;
 import bkoruznjak.from.hr.imagegeocoder.library.ImageScanner;
 import bkoruznjak.from.hr.imagegeocoder.util.PermissionHelper;
+import bkoruznjak.from.hr.imagegeocoder.view.adapter.ImageRecyclerAdapter;
 
 public class MainActivity extends AppCompatActivity implements ImageScanner.MediaListener {
 
     private ActivityMainBinding mainBinding;
     private ImageScanner mImageScanner;
-    private ArrayList<File> mFileList;
+    private ImageRecyclerAdapter mImageAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private List<File> mFileList;
     private ImageMetaReader mImageMetaReader;
     private Float[] mLocData = new Float[2];
     private final Activity INSTANCE = this;
@@ -33,33 +38,33 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        mFileList = new ArrayList<>();
-        mImageScanner = new ImageScanner();
+        mFileList = new ArrayList<File>();
         mImageMetaReader = new ImageMetaReader();
-        mainBinding.buttonGetPhotoData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (PermissionHelper.hasReadStorageRights(getBaseContext())) {
-                    mImageScanner.gatherImageInfo();
-                } else {
-                    PermissionHelper.requestReadStorage(INSTANCE);
-                }
-            }
-        });
+        init();
+    }
 
-        mainBinding.buttonGetPhotoLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("žžž", "hvatam metadata za lat:" + mLocData[0] + ", long:" + mLocData[1]);
-                new GeocodeAsyncTask(INSTANCE).execute(mLocData[0], mLocData[1]);
-            }
-        });
+    private void init() {
+        mImageAdapter = new ImageRecyclerAdapter(this, mFileList);
+        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mainBinding.imageRecyclerView.setLayoutManager(mLayoutManager);
+        mainBinding.imageRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mainBinding.imageRecyclerView.setAdapter(mImageAdapter);
+    }
+
+    private void startImageScanner() {
+        mImageScanner = new ImageScanner();
+        mImageScanner.prepare(this, this);
+        mImageScanner.gatherImageInfo();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mImageScanner.prepare(this, this);
+        if (PermissionHelper.hasReadStorageRights(getBaseContext())) {
+            startImageScanner();
+        } else {
+            PermissionHelper.requestReadStorage(INSTANCE);
+        }
     }
 
     @Override
@@ -75,9 +80,7 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         switch (requestCode) {
             case PermissionHelper.READ_EXTERNAL_STORAGE_PERMISSION_ID:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (mImageScanner != null) {
-                        mImageScanner.gatherImageInfo();
-                    }
+                    startImageScanner();
                 } else {
                     Toast.makeText(getApplicationContext(), "App does not have sufficient permissions to check your media", Toast.LENGTH_SHORT).show();
                 }
@@ -87,11 +90,12 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
 
     @Override
     public void onMediaFound(String data) {
-        Log.d("žžž", "photo found:" + data);
         File imgFile = new File(data);
-        Log.d("žžž", "created new file:" + imgFile.isFile());
         mFileList.add(imgFile);
-        mLocData = mImageMetaReader.readMetadataLoc(data);
+        mImageAdapter.notifyDataSetChanged();
+//        mLocData = mImageMetaReader.readMetadataLoc(data);
+//        Log.d("žžž", "hvatam metadata za lat:" + mLocData[0] + ", long:" + mLocData[1]);
+//        new GeocodeAsyncTask(INSTANCE).execute(mLocData[0], mLocData[1]);
     }
 
     public void manageProgressBar(boolean show) {

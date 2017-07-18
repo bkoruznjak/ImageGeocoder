@@ -8,33 +8,6 @@
         android:layout_height="match_parent"
         tools:context="bkoruznjak.from.hr.imagegeocoder.view.activity.MainActivity">
 
-        <Button
-            android:id="@+id/buttonGetPhotoData"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Get photo data"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="8dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginRight="8dp"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/buttonGetPhotoLocation"
-            app:layout_constraintVertical_bias="0.925" />
-
-        <Button
-            android:id="@+id/buttonGetPhotoLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Get location"
-            android:layout_marginLeft="8dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginRight="8dp"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginBottom="76dp"
-            app:layout_constraintBottom_toTopOf="@+id/progressBar" />
-
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
@@ -46,6 +19,33 @@
             android:layout_marginLeft="8dp"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginRight="8dp"
-            app:layout_constraintRight_toRightOf="parent" />
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="8dp"
+            app:layout_constraintVertical_bias="0.857"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/centerGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5"
+            tools:layout_editor_absoluteY="337dp"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/imageRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/centerGuideline" />
     </android.support.constraint.ConstraintLayout>
 </layout>
