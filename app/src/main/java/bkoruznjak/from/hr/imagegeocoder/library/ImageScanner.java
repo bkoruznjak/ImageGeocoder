@@ -10,17 +10,17 @@ import android.provider.MediaStore;
  * Created by bkoruznjak on 18/07/2017.
  */
 
-public class PhotoScanner {
+public class ImageScanner {
     private boolean goodToGo;
     private Context mContext;
     private MediaListener mMediaListener;
 
     /**
-     * Prepares the PhotoScanner for photo retrieval. We need the context for the Content Resolver.
+     * Prepares the ImageScanner for image retrieval. We need the context for the Content Resolver.
      * <p>
-     * Sets the media listener for new songs.
+     * Sets the media listener for new images.
      * <p>
-     * prepareSong() should be called in onStart()
+     * prepare() should be called in onStart()
      *
      * @param context
      * @param mediaListener
@@ -32,7 +32,7 @@ public class PhotoScanner {
     }
 
     /**
-     * Call clean() when you no longer use the PhotoScanner, preferably onStop()
+     * Call clean() when you no longer use the ImageScanner, preferably onStop()
      */
     public void clean() {
         goodToGo = false;
@@ -41,12 +41,12 @@ public class PhotoScanner {
     }
 
     /**
-     * Collects photo info from the Content Resolver and returns and notifies the media listener
+     * Collects images from the Content Resolver then returns and notifies the media listener
      * when finished.
      * <p>
-     * Throws Illegal Argument Exception when called prior to a prepareSong().
+     * Throws Illegal Argument Exception when called prior to a prepare().
      */
-    public void gatherPhotoInfo() {
+    public void gatherImageInfo() {
         if (goodToGo) {
             ContentResolver cr = mContext.getContentResolver();
 
@@ -72,12 +72,12 @@ public class PhotoScanner {
 
             cur.close();
         } else {
-            throw new IllegalArgumentException("read called before prepareSong");
+            throw new IllegalArgumentException("read called before prepare");
         }
     }
 
     /**
-     * Implement this to get data from the photo scanner back to you.
+     * Implement this to get data from the image scanner back to you.
      */
     public interface MediaListener {
 

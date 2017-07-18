@@ -11,25 +11,25 @@ import android.widget.Toast;
 
 import bkoruznjak.from.hr.imagegeocoder.R;
 import bkoruznjak.from.hr.imagegeocoder.databinding.ActivityMainBinding;
-import bkoruznjak.from.hr.imagegeocoder.library.PhotoScanner;
+import bkoruznjak.from.hr.imagegeocoder.library.ImageScanner;
 import bkoruznjak.from.hr.imagegeocoder.util.PermissionHelper;
 
-public class MainActivity extends AppCompatActivity implements PhotoScanner.MediaListener {
+public class MainActivity extends AppCompatActivity implements ImageScanner.MediaListener {
 
     private ActivityMainBinding mainBinding;
-    private PhotoScanner mPhotoScanner;
+    private ImageScanner mImageScanner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        mPhotoScanner = new PhotoScanner();
+        mImageScanner = new ImageScanner();
         mainBinding.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (PermissionHelper.hasReadStorageRights(getBaseContext())) {
-                    mPhotoScanner.gatherPhotoInfo();
+                    mImageScanner.gatherImageInfo();
                 } else {
                     PermissionHelper.requestReadStorage(getParent());
                 }
@@ -40,13 +40,13 @@ public class MainActivity extends AppCompatActivity implements PhotoScanner.Medi
     @Override
     protected void onStart() {
         super.onStart();
-        mPhotoScanner.prepare(this, this);
+        mImageScanner.prepare(this, this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mPhotoScanner.clean();
+        mImageScanner.clean();
     }
 
     @Override
@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity implements PhotoScanner.Medi
         switch (requestCode) {
             case PermissionHelper.READ_EXTERNAL_STORAGE_PERMISSION_ID:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (mPhotoScanner != null) {
-                        mPhotoScanner.gatherPhotoInfo();
+                    if (mImageScanner != null) {
+                        mImageScanner.gatherImageInfo();
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "App does not have sufficient permissions to check your media", Toast.LENGTH_SHORT).show();
