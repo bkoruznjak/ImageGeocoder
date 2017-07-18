@@ -11,6 +11,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +31,7 @@ import bkoruznjak.from.hr.imagegeocoder.library.ImageScanner;
 import bkoruznjak.from.hr.imagegeocoder.util.PermissionHelper;
 import bkoruznjak.from.hr.imagegeocoder.view.adapter.ImageRecyclerAdapter;
 
-public class MainActivity extends AppCompatActivity implements ImageScanner.MediaListener {
+public class MainActivity extends AppCompatActivity implements ImageScanner.MediaListener ,OnMapReadyCallback{
 
     private ActivityMainBinding mainBinding;
     private ImageScanner mImageScanner;
@@ -32,12 +40,22 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
     private List<File> mFileList;
     private ImageMetaReader mImageMetaReader;
 
+    //map
+    private static final float DEFAULT_ZOOM_LEVEL = 8.0f;
+    private final String mDatePattern = "dd-MM-yyyy";
+    private float mCoordinateOffset = 0.0001f;
+    private boolean isReducingOffset = false;
+    private GoogleMap mMap;
+    private double mLatitude = 45.77;
+    private double mLongitude = 15.98;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         mFileList = new ArrayList<File>();
         mImageMetaReader = new ImageMetaReader();
+        mainBinding.mapView.onCreate(savedInstanceState);
         init();
     }
 
@@ -47,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         mainBinding.imageRecyclerView.setLayoutManager(mLayoutManager);
         mainBinding.imageRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mainBinding.imageRecyclerView.setAdapter(mImageAdapter);
+
+
+        mainBinding.mapView.getMapAsync(this);
     }
 
     private void startImageScanner() {
@@ -63,6 +84,18 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         } else {
             PermissionHelper.requestReadStorage(this);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mainBinding.mapView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mainBinding.mapView.onPause();
     }
 
     @Override
@@ -108,7 +141,22 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         } else {
             Toast.makeText(this, "Image does not have coordinates", Toast.LENGTH_SHORT);
         }
+    }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        //user marker
+        mMap = googleMap;
+        LatLng userLocation = new LatLng(mLatitude, mLongitude);
+        mMap.addMarker(new MarkerOptions().position(userLocation).title("Your location"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, DEFAULT_ZOOM_LEVEL));
+    }
 
+    public void addImageMarker(float latitude, float longitude, String address){
+        LatLng imageLocation = new LatLng(latitude, longitude);
+        Marker imageMarker = mMap.addMarker(new MarkerOptions()
+                .position(imageLocation)
+                .title(address)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.img_picture)));
     }
 }

@@ -22,6 +22,8 @@ public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
 
     private String errorMessage = "";
     private final Activity mActivity;
+    private float latitude = 0.0f;
+    private float longitude = 0.0f;
 
     public GeocodeAsyncTask(Activity activity) {
         this.mActivity = activity;
@@ -39,6 +41,8 @@ public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
 
         try {
             addresses = geocoder.getFromLocation(params[0], params[1], 1);
+            latitude = params[0];
+            longitude = params[1];
         } catch (IOException ioException) {
             errorMessage = "Service Not Available";
             Log.e("žžž", errorMessage, ioException);
@@ -62,6 +66,7 @@ public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
             for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
                 addressName += " --- " + address.getAddressLine(i);
             }
+            ((MainActivity) mActivity).addImageMarker(latitude,longitude,addressName);
             Toast.makeText(mActivity, addressName, Toast.LENGTH_SHORT).show();
         }
     }
