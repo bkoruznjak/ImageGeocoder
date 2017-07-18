@@ -3,13 +3,6 @@ package bkoruznjak.from.hr.imagegeocoder.library;
 import android.media.ExifInterface;
 import android.util.Log;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
-
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -30,30 +23,5 @@ public class ImageMetaReader {
             Log.e("žžž", "error reading exif");
         }
 
-    }
-
-
-    public void readMetadata(File imageFile) {
-        try {
-            Metadata mMetadata = ImageMetadataReader.readMetadata(imageFile);
-
-            for (Directory directory : mMetadata.getDirectories()) {
-                for (Tag tag : directory.getTags()) {
-                    System.out.format("[%s] - %s = %s",
-                            directory.getName(), tag.getTagName(), tag.getDescription());
-                }
-                if (directory.hasErrors()) {
-                    for (String error : directory.getErrors()) {
-                        System.err.format("ERROR: %s", error);
-                    }
-                }
-            }
-
-        } catch (ImageProcessingException imgEx) {
-            Log.e("žžž", "image processing exception:" + imgEx);
-
-        } catch (IOException ioEx) {
-            Log.e("žžž", "IO exception:" + ioEx);
-        }
     }
 }
