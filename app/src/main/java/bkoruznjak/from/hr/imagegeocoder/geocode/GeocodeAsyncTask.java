@@ -1,0 +1,69 @@
+package bkoruznjak.from.hr.imagegeocoder.geocode;
+
+/**
+ * Created by bkoruznjak on 18/07/2017.
+ */
+
+
+import android.app.Activity;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+import bkoruznjak.from.hr.imagegeocoder.view.activity.MainActivity;
+
+public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
+
+    private String errorMessage = "";
+    private final Activity mActivity;
+
+    public GeocodeAsyncTask(Activity activity) {
+        this.mActivity = activity;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        ((MainActivity) mActivity).manageProgressBar(true);
+    }
+
+    @Override
+    protected Address doInBackground(Float... params) {
+        Geocoder geocoder = new Geocoder(mActivity, Locale.getDefault());
+        List<Address> addresses = null;
+
+        try {
+            addresses = geocoder.getFromLocation(params[0], params[1], 1);
+        } catch (IOException ioException) {
+            errorMessage = "Service Not Available";
+            Log.e("žžž", errorMessage, ioException);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            errorMessage = "Invalid Latitude or Longitude Used";
+            Log.e("žžž", errorMessage + ". " +
+                    "Latitude = " + params[0] + ", Longitude = " +
+                    params[1], illegalArgumentException);
+        }
+
+        if (addresses != null && addresses.size() > 0)
+            return addresses.get(0);
+
+        return null;
+    }
+
+    protected void onPostExecute(Address address) {
+        ((MainActivity) mActivity).manageProgressBar(false);
+        if (address != null) {
+            String addressName = "";
+            for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                addressName += " --- " + address.getAddressLine(i);
+            }
+            Log.d("žžž", "Latitude: " + address.getLatitude() + "\n" +
+                    "Longitude: " + address.getLongitude() + "\n" +
+                    "Address: " + addressName);
+        }
+    }
+}

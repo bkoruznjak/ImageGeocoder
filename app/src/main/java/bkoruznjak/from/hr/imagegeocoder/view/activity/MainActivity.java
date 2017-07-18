@@ -1,5 +1,6 @@
 package bkoruznjak.from.hr.imagegeocoder.view.activity;
 
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 
 import bkoruznjak.from.hr.imagegeocoder.R;
 import bkoruznjak.from.hr.imagegeocoder.databinding.ActivityMainBinding;
+import bkoruznjak.from.hr.imagegeocoder.geocode.GeocodeAsyncTask;
 import bkoruznjak.from.hr.imagegeocoder.library.ImageMetaReader;
 import bkoruznjak.from.hr.imagegeocoder.library.ImageScanner;
 import bkoruznjak.from.hr.imagegeocoder.util.PermissionHelper;
@@ -24,6 +26,8 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
     private ImageScanner mImageScanner;
     private ArrayList<File> mFileList;
     private ImageMetaReader mImageMetaReader;
+    private Float[] mLocData = new Float[2];
+    private final Activity INSTANCE = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,14 +36,22 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         mFileList = new ArrayList<>();
         mImageScanner = new ImageScanner();
         mImageMetaReader = new ImageMetaReader();
-        mainBinding.button.setOnClickListener(new View.OnClickListener() {
+        mainBinding.buttonGetPhotoData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (PermissionHelper.hasReadStorageRights(getBaseContext())) {
                     mImageScanner.gatherImageInfo();
                 } else {
-                    PermissionHelper.requestReadStorage(getParent());
+                    PermissionHelper.requestReadStorage(INSTANCE);
                 }
+            }
+        });
+
+        mainBinding.buttonGetPhotoLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("žžž", "hvatam metadata za lat:" + mLocData[0] + ", long:" + mLocData[1]);
+                new GeocodeAsyncTask(INSTANCE).execute(mLocData[0], mLocData[1]);
             }
         });
     }
@@ -79,7 +91,14 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         File imgFile = new File(data);
         Log.d("žžž", "created new file:" + imgFile.isFile());
         mFileList.add(imgFile);
+        mLocData = mImageMetaReader.readMetadataLoc(data);
+    }
 
-        mImageMetaReader.reatMetadataLoc(data);
+    public void manageProgressBar(boolean show) {
+        if (show) {
+            mainBinding.progressBar.setVisibility(View.VISIBLE);
+        } else {
+            mainBinding.progressBar.setVisibility(View.INVISIBLE);
+        }
     }
 }
