@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
     private ImageMetaReader mImageMetaReader;
 
     //map
-    private static final float DEFAULT_ZOOM_LEVEL = 8.0f;
+    private static final float DEFAULT_ZOOM_LEVEL = 6.0f;
     private final String mDatePattern = "dd-MM-yyyy";
     private float mCoordinateOffset = 0.0001f;
     private boolean isReducingOffset = false;
@@ -148,15 +148,15 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         //user marker
         mMap = googleMap;
         LatLng userLocation = new LatLng(mLatitude, mLongitude);
-        mMap.addMarker(new MarkerOptions().position(userLocation).title("Your location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, DEFAULT_ZOOM_LEVEL));
     }
 
     public void addImageMarker(float latitude, float longitude, String address){
         LatLng imageLocation = new LatLng(latitude, longitude);
+        mMap.clear();
         Marker imageMarker = mMap.addMarker(new MarkerOptions()
                 .position(imageLocation)
                 .title(address)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.img_picture)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.img_geolocal)));
     }
 }
