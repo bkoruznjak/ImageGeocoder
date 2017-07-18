@@ -31,18 +31,17 @@ import bkoruznjak.from.hr.imagegeocoder.library.ImageScanner;
 import bkoruznjak.from.hr.imagegeocoder.util.PermissionHelper;
 import bkoruznjak.from.hr.imagegeocoder.view.adapter.ImageRecyclerAdapter;
 
-public class MainActivity extends AppCompatActivity implements ImageScanner.MediaListener ,OnMapReadyCallback{
+public class MainActivity extends AppCompatActivity implements ImageScanner.MediaListener, OnMapReadyCallback {
 
+    //map
+    private static final float DEFAULT_ZOOM_LEVEL = 6.0f;
+    private final String mDatePattern = "dd-MM-yyyy";
     private ActivityMainBinding mainBinding;
     private ImageScanner mImageScanner;
     private ImageRecyclerAdapter mImageAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<File> mFileList;
     private ImageMetaReader mImageMetaReader;
-
-    //map
-    private static final float DEFAULT_ZOOM_LEVEL = 6.0f;
-    private final String mDatePattern = "dd-MM-yyyy";
     private float mCoordinateOffset = 0.0001f;
     private boolean isReducingOffset = false;
     private GoogleMap mMap;
@@ -136,10 +135,10 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
 
     public void checkForLocation(int imageIndex) {
         Float[] locationDataArray = mImageMetaReader.readMetadataLoc(mFileList.get(imageIndex).getPath());
-        if (locationDataArray[0] != 0 && locationDataArray[1] != 0) {
+        if (locationDataArray != null && locationDataArray[0] != 0 && locationDataArray[1] != 0) {
             new GeocodeAsyncTask(this).execute(locationDataArray[0], locationDataArray[1]);
         } else {
-            Toast.makeText(this, "Image does not have coordinates", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "Image does not have coordinates", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -151,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements ImageScanner.Medi
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, DEFAULT_ZOOM_LEVEL));
     }
 
-    public void addImageMarker(float latitude, float longitude, String address){
+    public void addImageMarker(float latitude, float longitude, String address) {
         LatLng imageLocation = new LatLng(latitude, longitude);
         mMap.clear();
         Marker imageMarker = mMap.addMarker(new MarkerOptions()

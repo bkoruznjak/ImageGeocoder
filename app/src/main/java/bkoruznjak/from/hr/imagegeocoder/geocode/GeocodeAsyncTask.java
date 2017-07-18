@@ -20,8 +20,8 @@ import bkoruznjak.from.hr.imagegeocoder.view.activity.MainActivity;
 
 public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
 
-    private String errorMessage = "";
     private final Activity mActivity;
+    private String errorMessage = "";
     private float latitude = 0.0f;
     private float longitude = 0.0f;
 
@@ -66,8 +66,10 @@ public class GeocodeAsyncTask extends AsyncTask<Float, Void, Address> {
             for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
                 addressName += " --- " + address.getAddressLine(i);
             }
-            ((MainActivity) mActivity).addImageMarker(latitude,longitude,addressName);
+            ((MainActivity) mActivity).addImageMarker(latitude, longitude, addressName);
             Toast.makeText(mActivity, addressName, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mActivity, "No known image address", Toast.LENGTH_SHORT).show();
         }
     }
 }
